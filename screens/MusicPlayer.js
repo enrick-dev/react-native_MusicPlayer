@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import { 
     View, 
     Text, 
@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     Dimensions,
     Image,
-    FlatList
+    FlatList,
 } from 'react-native'
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -16,6 +16,14 @@ import songs from '../model/data';
 const {width, height} = Dimensions.get('window')
 
 const MusicPlayer = () => {
+
+    const scrollX = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        scrollX.addListener(({value}) => {
+            console.log(value);
+        });
+    }, []);
 
     const renderSongs = ({item, index}) => {
         return (
