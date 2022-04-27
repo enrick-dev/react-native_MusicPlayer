@@ -8,6 +8,7 @@ import {
     Dimensions,
     Image,
     FlatList,
+    Animated
 } from 'react-native'
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -17,24 +18,29 @@ const {width, height} = Dimensions.get('window')
 
 const MusicPlayer = () => {
 
+    const [songIndex, setSongIndex] = useState(0)
+
     const scrollX = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         scrollX.addListener(({value}) => {
-            console.log(value);
+            // console.log(`ScrollX : ${value} | Device Width : ${width}`);
+            const index = Math.round( value / width);
+            setSongIndex(index);
+            // console.log(index);
         });
     }, []);
 
     const renderSongs = ({item, index}) => {
         return (
-            <View style={style.mainImageContainer}>
+            <Animated.View style={style.mainImageContainer}>
                 <View style={[style.imageContent, style.elevation]}>
                     <Image
                     source={item.artwork}
                     style={style.musicImage}
                     />
                 </View>
-            </View>
+            </Animated.View>
         )
     }
 
@@ -42,7 +48,7 @@ const MusicPlayer = () => {
     <SafeAreaView style={style.container}>
         <View style={style.maincontainer}>
             {/* image */}
-            <FlatList
+            <Animated.FlatList
                 renderItem={ renderSongs}
                 data={songs}
                 keyExtractor={item => item.id}
@@ -50,13 +56,22 @@ const MusicPlayer = () => {
                 pagingEnabled
                 showsHorizontalScrollIndicator = {false}
                 ScrollEventThrottle = {16}
-                 onScroll={() => {}}
+                 onScroll={Animated.event(
+                     [
+                         {
+                             nativeEvent : {
+                                 contentOffset : {x : scrollX} ,
+                             }
+                         }
+                     ],
+                     {useNativeDriver : true}
+                 )}
             />
 
             {/* song content */}
             <View>
-                <Text style={[style.songContent, style.songTitle]}>Some Title</Text>
-                <Text style={[style.songContent, style.songArtist]}>Some Artist</Text>
+                <Text style={[style.songContent, style.songTitle]}>{songs[songIndex].title}</Text>
+                <Text style={[style.songContent, style.songArtist]}>{songs[songIndex].artist}</Text>
             </View>
 
             {/* slider */}
